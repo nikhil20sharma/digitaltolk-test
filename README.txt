@@ -1,45 +1,46 @@
-Do at least ONE of the following tasks: refactor is mandatory. Write tests is optional, will be good bonus to see it. 
-Please do not invest more than 2-4 hours on this.
-Upload your results to a Github repo, for easier sharing and reviewing.
+# Code Refactoring Readme
 
-Thank you and good luck!
+Thank you for giving me the opportunity.
 
+- Arrays have been replaced with empty brackets, making it easier to read the code.
+- The if condition has been replaced with a ternary operator at the top of the method, to execute the where statement only if the variable has data.
+- A suggestion has been made to move the Curl code to a separate helper function in a new CurlHelper file. This would make it easier to call and reuse the method.
 
+Better code
+	Using a repository in Laravel is better
+	In repository a method called `isNeedToDelayPush` has been added to immediately return false and stop further execution. 
 
-Code to refactor
-=================
-1) app/Http/Controllers/BookingController.php
-2) app/Repository/BookingRepository.php
+Good but suggessions
 
-Code to write tests (optional)
-=====================
-3) App/Helpers/TeHelper.php method willExpireAt
-4) App/Repository/UserRepository.php, method createOrUpdate
+	In addition, it is suggested that for conditions where we check if a variable is set, we use ternary operators instead of if-else statements. 
 
+	To use the Curl code, the fields are first converted to JSON format using `json_encode`, and then passed to `curlPost` function in the CurlHelper file. The response is logged using the `$logger` object. 
+		$headers = array('Content-Type: application/json', $onesignalRestAuthKey);
+		$response = curlPost("https://onesignal.com/api/v1/notifications", $fields, $headers);
+		$logger->addInfo('Push send for job ' . $job_id . ' curl answer', [$response]);
 
-----------------------------
+	Overall, these changes to make the code more efficient, readable, and maintainable.
 
-What I expect in your repo:
+Suggessions
+	we will move notification method to helper file sendPushNotificationToSpecificUsers if we need to send notification then we will call helper directly
+	if we use que jobs it will reduse request time sendSMSNotificationToTranslator for this
+	we have to create config file for storing role ids like if we have 3 type for role like
+- student 
+- teacher
+- admin
 
-X. A readme with:   Your thoughts about the code. What makes it amazing code. Or what makes it ok code. Or what makes it terrible code. How would you have done it. Thoughts on formatting, structure, logic.. The more details that you can provide about the code (what's terrible about it or/and what is good about it) the easier for us to assess your coding style, mentality etc
+	return [
+		'student' => [
+			'id' => 1,
+		],
+		'teacher' => [
+			'id' => 2,
+		],
+		'admin' => [
+			'id' => 3,
+		],
+		// other roles
+	];
 
-And 
-
-Y.  Refactor it if you feel it needs refactoring. The more love you put into it. The easier for us to asses your thoughts, code principles etc
-
-
-IMPORTANT: Make two commits. First commit with original code. Second with your refactor so we can easily trace changes. 
-
-
-NB: you do not need to set up the code on local and make the web app run. It will not run as its not a complete web app. This is purely to assess you thoughts about code, formatting, logic etc
-
-
-===== So expected output is a GitHub link with either =====
-
-1. Readme described above (point X above) + refactored code 
-OR
-2. Readme described above (point X above) + refactored core + a unit test of the code that we have sent
-
-Thank you!
-
-
+	$studentId = config('role.student.id');
+	Add bulk insert for create // createOrUpdate

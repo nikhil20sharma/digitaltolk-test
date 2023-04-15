@@ -55,9 +55,9 @@ class UserRepository extends BaseRepository
 
 
         if (!$id || $id && $request['password']) $model->password = bcrypt($request['password']);
-        $model->detachAllRoles();
+        $model->detachAllRoles(); // modi : better
         $model->save();
-        $model->attachRole($request['role']);
+        $model->attachRole($request['role']); // modi : better
         $data = array();
 
         if ($request['role'] == env('CUSTOMER_ROLE_ID')) {
@@ -186,17 +186,28 @@ class UserRepository extends BaseRepository
         $townidUpdated = [];
         if ($request['user_towns_projects']) {
             $del = DB::table('user_towns')->where('user_id', '=', $model->id)->delete();
+            $townIds = [];
             foreach ($request['user_towns_projects'] as $townId) {
-                $userTown = new UserTowns();
-                $already_exit = $userTown::townExist($model->id, $townId);
+                $already_exit = UserTowns::townExist($model->id, $townId);
                 if ($already_exit == 0) {
-                    $userTown->user_id = $model->id;
-                    $userTown->town_id = $townId;
-                    $userTown->save();
+                    $townIds[] = ['user_id' => $model->id, 'town_id' => $townId];
                 }
-                $townidUpdated[] = $townId;
-
             }
+
+            if (!empty($townIds)) {
+                DB::table('user_towns')->insert($townIds); // we have one more method sync // but did't use this method (https://www.scratchcode.io/source-books/laravel-sync-with-an-example/)
+            }
+            // foreach ($request['user_towns_projects'] as $townId) {
+            //     $userTown = new UserTowns();
+            //     $already_exit = $userTown::townExist($model->id, $townId);
+            //     if ($already_exit == 0) {
+            //         $userTown->user_id = $model->id;
+            //         $userTown->town_id = $townId;
+            //         $userTown->save();
+            //     }
+            //     $townidUpdated[] = $townId;
+            // } 
+            // we will follow another way to store data in db like sync method insert method for bulk insert
         }
 
         if ($request['status'] == '1') {
